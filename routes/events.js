@@ -6,9 +6,8 @@ const { body, validationResult } = require("express-validator");
 const multer = require("multer");
 
 
-
 // ROUTE 1: Get all the Events using: GET "api/events/fetchallevents"
-router.get("/fetchallevents", fetchadmin, async (req, res) => {
+router.get("/fetchallevents", async (req, res) => {
   try {
     const events = await Events.find({ events: req.body.id });
     res.json(events);
@@ -19,49 +18,22 @@ router.get("/fetchallevents", fetchadmin, async (req, res) => {
 });
 
 
-const multerStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "upload/eventimage/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now() + file.originalname);
-  }
-})
-
-
-
-const multerFilter = (req, file, cb) => {
-if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-  cb(null, true);
-} else {
-  cb(null, false);
-}
-};
-
-const upload = multer({
-storage: multerStorage,
-fileFilter: multerFilter,
-});
-
-
 
 // ROUTE 2: Add a new event using: POST "api/events/addevent"
 router.post(
   "/addevent",
   fetchadmin,
-  upload.single('eventimage'),
   [
     body("title", "Enter a title"),
-    body("date", "Enter a date"),
-    body("month", "Enter a month"),
     body("eventimage", "choose image"),
     body("description", "Enter a description"),
     body("time" ,"Enter a time"),
+    body("date", "Enter a date"),
     body("address", "Enter a address"),
   ],
   async (req, res) => {
     try {
-      const { eventimage, title, date, month, description, time, address} = req.body;
+      const { title, description, time, date, address} = req.body;
       //if there are errors, return Bad request and the errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -70,18 +42,15 @@ router.post(
 
       const events = new Events({
         title,
-        date,
-        month,
-        eventimage: req.file.filename,
         description,
         time,
+        date,
         address,
       });
 
       const saveevents = await events.save();
 
       res.send(saveevents);
-      
     } catch (error) {
       console.log(error.massage);
       res.status(500).send("Internal Server Error");
@@ -90,27 +59,23 @@ router.post(
 );
 
 
-
 // ROUTE 3: Update an existing event using: PUT "api/events/updateevent"
-router.put("/updateevent/:id", upload.single('eventimage'), fetchadmin, async (req, res) => {
+router.put("/updateevent/:id", fetchadmin, async (req, res) => {
   try {
-    const { title, date, month, description, time, address} = req.body;
+    const { title, description, time, date, address} = req.body;
     //Create a newEvent object
-    const newEvents = {eventimage: req.file.filename};
+    const newEvents = {};
     if (title) {
       newEvents.title = title;
-    }
-    if (date) {
-      newEvents.date = date;
-    }
-    if (month) {
-      newEvents.month = month;
     }
     if (description) {
       newEvents.description = description;
     }
     if (time) {
       newEvents.time = time;
+    }
+    if (date) {
+      newEvents.date = date;
     }
     if (address) {
       newEvents.address = address;

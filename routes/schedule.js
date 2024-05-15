@@ -4,6 +4,8 @@ const fetchadmin = require("../middleware/fetchadmin");
 const Schedule = require("../models/Schedule");
 const { body, validationResult } = require("express-validator");
 
+
+
 // ROUTE 1: Get all the schedule using: GET "api/schedules/fetchallschedule"
 router.get("/fetchallschedule", async (req, res) => {
   try {
