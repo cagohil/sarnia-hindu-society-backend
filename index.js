@@ -30,7 +30,7 @@ app.use('/api/schedules', require('./routes/schedule'))
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Sarnia Hindu Society Backend Running!')
 })
 
 
