@@ -85,6 +85,7 @@ router.put("/updateschedule/:id", fetchadmin, async (req, res) => {
   }
 });
 
+
 // ROUTE 4: Delete an existing schedule using: DELETE "api/schedules/deleteschedule"
 router.delete("/deleteschedule/:id", fetchadmin, async (req, res) => {
   try {
