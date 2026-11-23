@@ -1,22 +1,19 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
-const JWT_SECRET = "thetempleofhindu";
+const AUTH_ERROR = { error: "Please authenticate using a valid token" };
 
-
-const fetchadmin = (req, res, next)=>{
-    // Get the user from the jwt token and add id to req object
-
-    const token = req.header('adminToken');
-    if(!token){
-        res.status(401).send({error: "Please authenticate using a valid token"})
-    }
-    try {
-        const data = jwt.verify(token, JWT_SECRET);
-        req.admin = data.admin;
-        next()
-        } catch (error) {
-            res.status(401).send({error: "Please authenticate using a valid token"})
-        }
-}
-
-module.exports = fetchadmin;
+// Verifies the `adminToken` header and puts the admin on req.admin.
+export const requireAdmin = (req, res, next) => {
+  const token = req.header("adminToken");
+  if (!token) {
+    return res.status(401).json(AUTH_ERROR);
+  }
+  try {
+    const data = jwt.verify(token, env.jwtSecret);
+    req.admin = data.admin;
+    return next();
+  } catch {
+    return res.status(401).json(AUTH_ERROR);
+  }
+};

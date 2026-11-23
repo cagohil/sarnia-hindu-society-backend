@@ -1,41 +1,35 @@
-const connectToMongo = require('./config/mongodb');
-var cors = require('cors')
-const express = require('express')
-const bodyParser = require("body-parser")
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import { env } from "./config/env.js";
+import { connectDB } from "./config/db.js";
+import apiRoutes from "./routes/index.js";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 
+const app = express();
 
-let path = require('path');
-path.join(__dirname, 'public');
+// Images in /resources are shown on the frontend (another origin), so allow cross-origin loading.
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(cors({ origin: env.corsOrigin === "*" ? true : env.corsOrigin.split(",").map((o) => o.trim()) }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true }));
+if (env.nodeEnv !== "production") app.use(morgan("dev"));
 
-connectToMongo();
-const app = express()
-const port = 8000
-app.use('/resources', express.static(__dirname + '/upload'));
+app.use("/resources", express.static(env.uploadDir));
 
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
+app.get("/", (req, res) => {
+  res.send("Sarnia Hindu Society Backend Running!");
+});
 
-app.use(cors())
-app.use(express.json());
+// Make sure the database is connected before any API request is handled.
+app.use("/api", async (req, res, next) => {
+  await connectDB();
+  next();
+});
+app.use("/api", apiRoutes);
 
-//Available Routes
-app.use('/api/admin', require('./routes/admin'))
-app.use('/api/events', require('./routes/events'))
-app.use('/api/gallery', require('./routes/gallery'))
-app.use('/api/members', require('./routes/members')) 
-app.use('/api/schedules', require('./routes/schedule')) 
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-
-app.get('/', (req, res) => {
-  res.send('Sarnia Hindu Society Backend Running!')
-})
-
-
-app.listen(port, () => {
-  console.log(`Sarnia Hindu Society listening on port http://localhost:${port}`)
-})
-
-
+export default app;

@@ -1,39 +1,20 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+import mongoose from "mongoose";
 
-const EventsSchema = new Schema(
-  {
-    title: {
-      type: String,
-    },
-    subtitle: {
-      type: String,
-    },
-    eventimage: {
-      // preset crest icon key ("deepa" | "dandiya") or a full image URL
-      type: String,
-    },
-    description: {
-      type: String,
-    },
-    time: {
-      type: String,
-    },
-    date: {
-      type: String,
-    },
-    address: {
-      type: String,
-    },
-    link: {
-      // ticket / registration URL (e.g. Zeffy)
-      type: String,
-    },
-    buttonText: {
-      type: String,
-    },
-  },
+export const EVENT_FIELDS = [
+  "title",
+  "subtitle",
+  "eventimage", // preset crest icon key ("deepa" | "dandiya" | "logo") or a full image URL
+  "description",
+  "time",
+  "date",
+  "address",
+  "link", // ticket / registration URL (e.g. Zeffy)
+  "buttonText",
+];
+
+const eventSchema = new mongoose.Schema(
+  Object.fromEntries(EVENT_FIELDS.map((field) => [field, { type: String }])),
   { timestamps: true }
 );
 
-module.exports = mongoose.model("events", EventsSchema);
+export const Event = mongoose.model("events", eventSchema);

@@ -1,13 +1,10 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+import mongoose from "mongoose";
 
-const MemberSchema = new Schema({
-    name:{
-        type: String,
-    },
-    designation:{
-        type: String,
-    }
+export const MEMBER_FIELDS = ["name", "designation"];
+
+const memberSchema = new mongoose.Schema({
+  name: { type: String },
+  designation: { type: String },
 });
 
-module.exports = mongoose.model('members', MemberSchema);
+export const Member = mongoose.model("members", memberSchema);

@@ -1,13 +1,10 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+import mongoose from "mongoose";
 
-const ScheduleSchema = new Schema({
-    title:{
-        type: String,
-    },
-    time:{
-        type: String,
-    }
+export const SCHEDULE_FIELDS = ["title", "time"];
+
+const scheduleSchema = new mongoose.Schema({
+  title: { type: String },
+  time: { type: String },
 });
 
-module.exports = mongoose.model('schedules', ScheduleSchema);
+export const Schedule = mongoose.model("schedules", scheduleSchema);
